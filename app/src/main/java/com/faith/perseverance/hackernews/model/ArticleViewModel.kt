@@ -3,6 +3,7 @@ package com.faith.perseverance.hackernews.model
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,6 +17,10 @@ class ArticleViewModel(): ViewModel() {
         MutableLiveData<List<Article>>()
     }
 
+    private val _navigateToWebFragment = MutableLiveData<Boolean?>()
+
+    val navigativeToWebFragment: LiveData<Boolean?> get() = _navigateToWebFragment
+
 
     private var TAG: String = "ArticleViewModel"
 
@@ -24,26 +29,16 @@ class ArticleViewModel(): ViewModel() {
         getArticles()
     }
 
-
-    fun getMockData(): MutableList<List<Article>>
+    fun doneNavigating()
     {
-        /**
-       var mockData: MutableList<Article> = mutableListOf(Article("Harry Potter","Chamber", Date()),
-           Article("Jon Favreau","Mandalorian", Date()),
-           Article("Kobe Bryant","Black Mamba", Date()),
-           Article("Lebron James","King James", Date()),
-           Article("Christopher Holmes","Faith Passion", Date()),
-           Article("Christopher Holmes","Passion Perseverance", Date()),
-           Article("Christopher Holmes","Perseverance $100K", Date()),
-           Article("Christopher Holmes","$200K", Date()),
-           Article("Christopher Holmes","$300K", Date()))
-
-        return mockData
-       */
-
-        return mutableListOf()
-
+        _navigateToWebFragment.value = null
     }
+
+    fun startNavigating()
+    {
+        _navigateToWebFragment.value = true
+    }
+
 
 
     @RequiresApi(Build.VERSION_CODES.O)

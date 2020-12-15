@@ -15,12 +15,8 @@ class ArticleAdapter(private val dataSet: List<Article>?, private val context: C
 {
 
     private var TAG = "ArticleAdapter"
-    private val clickHandler: ClickEventHandler = context as ClickEventHandler
-    private var url: String = ""
 
-    interface ClickEventHandler {
-        fun openURL(holder: View)
-    }
+    private var url: String = ""
 
 
 
@@ -45,9 +41,6 @@ class ArticleAdapter(private val dataSet: List<Article>?, private val context: C
         // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
                 .inflate(R.layout.text_row_item, viewGroup, false)
-        view.setOnClickListener{
-            clickHandler.openURL(it)
-        }
 
         return ViewHolder(view)
 
@@ -77,14 +70,8 @@ class ArticleAdapter(private val dataSet: List<Article>?, private val context: C
         viewHolder.article_title.text = title
         viewHolder.article_points.text = points
 
-
     }
 
-    fun getURL(): String
-    {
-
-        return url
-    }
 
     override fun getItemCount(): Int {
         if (dataSet != null) {
@@ -95,3 +82,4 @@ class ArticleAdapter(private val dataSet: List<Article>?, private val context: C
     }
 
 }
+

@@ -3,7 +3,6 @@ package com.faith.perseverance.hackernews.view
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -20,7 +19,7 @@ import com.faith.perseverance.hackernews.model.NetworkManager
 
 
 
-class MainActivity : AppCompatActivity(), ArticleAdapter.ClickEventHandler {
+class MainActivity : AppCompatActivity() {
 
     private var TAG: String = "OnCreate"
 
@@ -61,15 +60,6 @@ class MainActivity : AppCompatActivity(), ArticleAdapter.ClickEventHandler {
         }
 
         viewModel.articles.observe(this, observer)
-
-    }
-
-    override fun openURL(holder: View) {
-
-        Log.v(TAG, "open url")
-
-
-
 
     }
 
