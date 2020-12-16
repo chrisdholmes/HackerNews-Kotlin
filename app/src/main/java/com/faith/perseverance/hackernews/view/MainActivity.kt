@@ -1,5 +1,7 @@
 package com.faith.perseverance.hackernews.view
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -19,7 +21,7 @@ import com.faith.perseverance.hackernews.model.NetworkManager
 
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CellClickListener {
 
     private var TAG: String = "OnCreate"
 
@@ -43,9 +45,11 @@ class MainActivity : AppCompatActivity() {
             Log.v(TAG, "button clicked")
             if(networkManager.connected)
             {
+
                 viewModel.getArticles()
             } else {
                 var toast: Toast = Toast.makeText(this, "Connect to the network.",Toast.LENGTH_SHORT)
+                toast.show()
             }
         }
 
@@ -53,14 +57,21 @@ class MainActivity : AppCompatActivity() {
             object : Observer<List<Article>> {
             override fun onChanged(hits: List<Article>) {
                 Log.v(TAG, "on changed: ${hits}")
-                articleAdapter = ArticleAdapter(hits, context = this@MainActivity)
                 recyclerView.layoutManager = LinearLayoutManager(baseContext)
+                articleAdapter = ArticleAdapter(hits, context = this@MainActivity, this@MainActivity)
                 recyclerView.adapter = articleAdapter
             }
         }
 
         viewModel.articles.observe(this, observer)
 
+    }
+
+    override fun onCellClickListener(article: Article) {
+        Toast.makeText(this, article.url, Toast.LENGTH_SHORT).show()
+        var intent = Intent(android.content.Intent.ACTION_VIEW)
+        intent.data = Uri.parse(article.url)
+        startActivity(intent)
     }
 
 
