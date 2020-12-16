@@ -6,12 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.faith.perseverance.hackernews.R
 import com.faith.perseverance.hackernews.model.Article
 
 
-class ArticleAdapter(private val dataSet: List<Article>?, private val context: Context): RecyclerView.Adapter<ArticleAdapter.ViewHolder>()
+class ArticleAdapter(private val data: List<Article>?, private val context: Context, private val cellClickListener: CellClickListener): RecyclerView.Adapter<ArticleAdapter.ViewHolder>()
 {
 
     private var TAG = "ArticleAdapter"
@@ -25,12 +26,14 @@ class ArticleAdapter(private val dataSet: List<Article>?, private val context: C
         private var TAG = "ViewHolder"
         val article_title: TextView
         val article_points: TextView
+        val linearlayout: LinearLayoutCompat
 
 
         init {
             // Define a click listener for hte ViewHolder's View ...
             article_title = view.findViewById(R.id.article_title)
             article_points = view.findViewById(R.id.article_points)
+            linearlayout = view.findViewById(R.id.linearlayout)
 
         }
 
@@ -53,11 +56,13 @@ class ArticleAdapter(private val dataSet: List<Article>?, private val context: C
         var title = ""
         var points = ""
         var url = ""
-        if(dataSet != null) {
+        var article = Article(url = "https://www.google.com")
 
-            title = dataSet.get(position).title
-            points = "Points: ${dataSet.get(position).points}"
-            url = dataSet.get(position).url
+        if(data != null) {
+
+            title = data.get(position).title
+            points = "Points: ${data.get(position).points}"
+            article = data.get(position)
 
 
             Log.v(TAG,"ran $title + $points")
@@ -70,12 +75,18 @@ class ArticleAdapter(private val dataSet: List<Article>?, private val context: C
         viewHolder.article_title.text = title
         viewHolder.article_points.text = points
 
+        viewHolder.linearlayout.setOnClickListener{
+            cellClickListener.onCellClickListener(article)
+        }
+
+
+
     }
 
 
     override fun getItemCount(): Int {
-        if (dataSet != null) {
-            return dataSet.size
+        if (data != null) {
+            return data.size
         } else {
             return 5
         }
@@ -83,3 +94,6 @@ class ArticleAdapter(private val dataSet: List<Article>?, private val context: C
 
 }
 
+interface CellClickListener{
+    fun onCellClickListener(article: Article)
+}
