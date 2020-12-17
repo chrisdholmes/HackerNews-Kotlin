@@ -3,12 +3,20 @@ package com.faith.perseverance.hackernews.model
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime.now
+
+/**
+ * Retrieves articles from the HNApi retro fit service
+ * and stores them in to a list of articles.
+ *
+ * @constructor retrieves articles
+ * @property articles MutableLiveData<List<Article>>
+ */
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 class ArticleViewModel(): ViewModel() {
@@ -17,48 +25,27 @@ class ArticleViewModel(): ViewModel() {
         MutableLiveData<List<Article>>()
     }
 
-    private val _navigateToWebFragment = MutableLiveData<Boolean?>()
-
-    val navigativeToWebFragment: LiveData<Boolean?> get() = _navigateToWebFragment
-
-
+    //TAG for logging
     private var TAG: String = "ArticleViewModel"
 
     init{
-
+        // retrieve articles when class is initialized
         getArticles()
     }
-
-    fun doneNavigating()
-    {
-        _navigateToWebFragment.value = null
-    }
-
-    fun startNavigating()
-    {
-        _navigateToWebFragment.value = true
-    }
-
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getArticles()
     {
-        Log.v(TAG, "get articles ()")
-
+            //launch CoRoutine that uses HNApi to retrieve articles
             viewModelScope.launch {
                 try {
                     Log.v(TAG, "coroutine launched - ${now()}")
                     var hits = HNApi.retrofitService.getProperties().hits
                     articles.postValue(hits)
                     Log.v(TAG, "coroutine completed - ${now()}")
-                    Log.v(TAG, "test: ${articles.value}")
-
                 } catch (e: Exception) {
-
                     Log.v(TAG, e.toString())
                     Log.v(TAG, "coroutine failed - ${now()}")
-
                 }
             }
 

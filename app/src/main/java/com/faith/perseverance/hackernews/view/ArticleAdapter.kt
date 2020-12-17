@@ -1,7 +1,5 @@
 package com.faith.perseverance.hackernews.view
 
-import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,30 +9,30 @@ import androidx.recyclerview.widget.RecyclerView
 import com.faith.perseverance.hackernews.R
 import com.faith.perseverance.hackernews.model.Article
 
+/**
+ * ArticleAdapter displays a list of articles in the recyclerview
+ * of HomeActivity. Provides the article selected to the HomeActivity
+ * with the delegate pattern using the CellClickListener interface
+ *
+ * @param data List<Article>?
+ * @param cellClickListener CellClickListener
+ */
 
-class ArticleAdapter(private val data: List<Article>?, private val context: Context, private val cellClickListener: CellClickListener): RecyclerView.Adapter<ArticleAdapter.ViewHolder>()
+class ArticleAdapter(private val data: List<Article>?, private val cellClickListener: CellClickListener): RecyclerView.Adapter<ArticleAdapter.ViewHolder>()
 {
-
-    private var TAG = "ArticleAdapter"
-
-    private var url: String = ""
-
-
+    //private var TAG = "ArticleAdapter"
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
     {
-        private var TAG = "ViewHolder"
-        val article_title: TextView
-        val article_points: TextView
+        //private var TAG = "ViewHolder"
+        val articleTitle: TextView
+        val articlePoints: TextView
         val linearlayout: LinearLayoutCompat
 
-
         init {
-            // Define a click listener for hte ViewHolder's View ...
-            article_title = view.findViewById(R.id.article_title)
-            article_points = view.findViewById(R.id.article_points)
+            articleTitle = view.findViewById(R.id.article_title)
+            articlePoints = view.findViewById(R.id.article_points)
             linearlayout = view.findViewById(R.id.linearlayout)
-
         }
 
     }
@@ -52,46 +50,33 @@ class ArticleAdapter(private val data: List<Article>?, private val context: Cont
     // Replace the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
 
-
         var title = ""
         var points = ""
         var url = ""
         var article = Article(url = "https://www.google.com")
 
         if(data != null) {
-
             title = data.get(position).title
             points = "Points: ${data.get(position).points}"
             article = data.get(position)
-
-
-            Log.v(TAG,"ran $title + $points")
-
         } else {
-            title = "$position title"
-
+            title = "Something went wrong ... "
         }
-
-        viewHolder.article_title.text = title
-        viewHolder.article_points.text = points
+        viewHolder.articleTitle.text = title
+        viewHolder.articlePoints.text = points
 
         viewHolder.linearlayout.setOnClickListener{
             cellClickListener.onCellClickListener(article)
         }
-
-
-
     }
-
 
     override fun getItemCount(): Int {
         if (data != null) {
             return data.size
         } else {
-            return 5
+            return 1
         }
     }
-
 }
 
 interface CellClickListener{
