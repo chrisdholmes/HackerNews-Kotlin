@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">HackerNews</string>
     <string name="element_text">HackerNews</string>
+    <string name="share">Share</string>
+    <string name="save">Save</string>
+    <string name="bookmarks">Bookmarks</string>
 </resources>
