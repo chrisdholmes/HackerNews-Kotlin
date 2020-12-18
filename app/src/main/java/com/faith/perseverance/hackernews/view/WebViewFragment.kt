@@ -45,10 +45,7 @@ class WebViewFragment : Fragment() {
     //3
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         //retrieve bundle
         val bundle = arguments

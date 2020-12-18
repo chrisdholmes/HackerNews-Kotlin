@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -85,24 +86,17 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
 
     //on back pressed removes displayed fragment and returns to home page
     override fun onBackPressed() {
-
-        var fragment = supportFragmentManager.findFragmentByTag("webView")
-
-        Log.v(TAG, "# of frags: ${supportFragmentManager.fragments.size}")
-
-        if(fragment != null) {
-            supportFragmentManager.beginTransaction().detach(fragment).commit()
-        }
+        hideFragment()
     }
 
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.display_bookmarks -> {
-            // TODO(Display recyclerview of saved bookmarks in a fragment)
+            var bookMarksFragment = BookMarksFragment.newInstance()
+            showFragment(bookMarksFragment)
             true
         }
         else -> {
-
             super.onOptionsItemSelected(item)
         }
     }
@@ -117,5 +111,29 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         share?.isVisible = false
 
         return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun showFragment(fragment: Fragment)
+    {
+        if(supportFragmentManager.backStackEntryCount < 1) {
+            supportFragmentManager
+                    .beginTransaction()
+                    .add(R.id.main_activity_layout, fragment)
+                    .commit()
+        }
+
+    }
+
+    private fun hideFragment()
+    {
+        if(supportFragmentManager.backStackEntryCount <= 1) {
+            var fragment = supportFragmentManager.fragments.get(0)
+
+            Log.v(TAG, "# of frags: ${supportFragmentManager.fragments.size}")
+
+            if (fragment != null) {
+                supportFragmentManager.beginTransaction().detach(fragment).commit()
+            }
+        }
     }
 }
