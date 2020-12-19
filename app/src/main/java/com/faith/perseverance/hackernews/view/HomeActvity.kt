@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.faith.perseverance.hackernews.R
 import com.faith.perseverance.hackernews.model.Article
 import com.faith.perseverance.hackernews.model.ArticleViewModel
+import com.faith.perseverance.hackernews.model.ArticleViewModelFactory
+import com.faith.perseverance.hackernews.model.ArticlesApplication
 
 /**
  *  HomeActivity is the home page of the HackerNews App.
@@ -33,7 +35,9 @@ import com.faith.perseverance.hackernews.model.ArticleViewModel
 class HomeActvity : AppCompatActivity(), CellClickListener {
 
     private var TAG: String = "OnCreate"
-    private val viewModel  by viewModels<ArticleViewModel>()
+    private val viewModel: ArticleViewModel by viewModels {
+        ArticleViewModelFactory((application as ArticlesApplication).repository)
+    }
     private lateinit var articleAdapter: ArticleAdapter
 
     @RequiresApi(Build.VERSION_CODES.O)

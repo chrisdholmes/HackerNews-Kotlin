@@ -1,12 +1,14 @@
 package com.faith.perseverance.hackernews.model
 
-import androidx.lifecycle.LiveData
+import androidx.annotation.WorkerThread
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-class ArticleRepository(private val database: ArticleDatabase) {
-    val bookMarks: LiveData<List<Article>> = database.articleDao.getBookmarks()
+class ArticleRepository(private val articleDAO: ArticleDAO) {
+
+    val bookMarks: Flow<List<Article>> = articleDAO.getBookmarks()
 
     suspend fun updateArticles()
     {
@@ -16,4 +18,17 @@ class ArticleRepository(private val database: ArticleDatabase) {
             var hits = HNApi.retrofitService.getProperties().hits
         }
     }
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun addBookMark(bookMark: Article)
+    {
+        articleDAO.addBookmark(bookMark)
+    }
+
+    @WorkerThread
+    suspend fun deleteBookMark(bookMark: Article)
+    {
+        articleDAO.deleteBookmark(bookMark)
+    }
+
 }

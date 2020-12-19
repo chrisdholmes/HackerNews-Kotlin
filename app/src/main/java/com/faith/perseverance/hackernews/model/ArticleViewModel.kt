@@ -3,18 +3,18 @@ package com.faith.perseverance.hackernews.model
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime.now
 
 @RequiresApi(Build.VERSION_CODES.O)
-class ArticleViewModel(): ViewModel() {
+class ArticleViewModel(private val repository: ArticleRepository): ViewModel() {
 
     val articles: MutableLiveData<List<Article>> by lazy {
         MutableLiveData<List<Article>>()
     }
+
+    val bookMarks: LiveData<List<Article>> = repository.bookMarks.asLiveData()
 
     private var TAG: String = "ArticleViewModel"
 
@@ -46,4 +46,23 @@ class ArticleViewModel(): ViewModel() {
 
     }
 
+    fun addBookMark(article: Article) = viewModelScope.launch {
+        repository.addBookMark(article)
+    }
+
+    fun deleteBookMark(article: Article) = viewModelScope.launch {
+        repository.deleteBookMark(article)
+    }
+
+}
+
+class ArticleViewModelFactory(private val repository: ArticleRepository) : ViewModelProvider.Factory {
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ArticleViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return ArticleViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
 }
