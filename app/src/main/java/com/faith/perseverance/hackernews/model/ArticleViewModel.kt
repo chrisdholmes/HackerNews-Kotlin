@@ -18,10 +18,33 @@ class ArticleViewModel(private val repository: ArticleRepository): ViewModel() {
 
     private var TAG: String = "ArticleViewModel"
 
+    val articleSelected: MutableLiveData<Article> by lazy {
+        MutableLiveData<Article>()
+   }
+
     init{
 
         getArticles()
     }
+
+    fun setArticleSelected(article: Article)
+    {
+        articleSelected.value = article
+    }
+
+    fun getArticleSelected(): Article?
+    {
+        return articleSelected.value
+    }
+
+    fun bookMarkSelectedArticle()
+    {
+        if(articleSelected.value != null)
+        {
+            addBookMark(articleSelected.value!!)
+        }
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getArticles()
@@ -31,7 +54,7 @@ class ArticleViewModel(private val repository: ArticleRepository): ViewModel() {
             viewModelScope.launch {
                 try {
                     Log.v(TAG, "coroutine launched - ${now()}")
-                    var hits = HNApi.retrofitService.getProperties().hits
+                    val hits = HNApi.retrofitService.getProperties().hits
                     articles.postValue(hits)
                     Log.v(TAG, "coroutine completed - ${now()}")
                     Log.v(TAG, "test: ${articles.value}")

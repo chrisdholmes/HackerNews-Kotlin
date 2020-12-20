@@ -66,18 +66,14 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         viewModel.articles.observe(this, observer)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCellClickListener(article: Article) {
 
-        //initialize a Bundle for storing article information
-        //function inherits from the custom OnCellClickListener interface in ArticleAdapter class
-        val bundle = Bundle()
-        bundle.putString("url", article.url)
-        bundle.putString("title",article.title)
-
         // initialize webfragment
-        var webfragment = WebViewFragment.newInstance()
+        val webfragment = WebViewFragment.newInstance(application as ArticlesApplication)
         // generate fragment with bundle that contains url and title of article selected
-        webfragment.arguments = bundle
+
+        viewModel.setArticleSelected(article)
 
         //push fragment to display if only 1 fragment is displayed (1 webviewfrag at at time)
         if(supportFragmentManager.backStackEntryCount < 1) {
@@ -96,7 +92,7 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.display_bookmarks -> {
-            var bookMarksFragment = BookMarksFragment.newInstance()
+            val bookMarksFragment = BookMarksFragment.newInstance(application, supportFragmentManager)
             showFragment(bookMarksFragment)
             true
         }
@@ -130,14 +126,14 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
 
     private fun hideFragment()
     {
-        if(supportFragmentManager.backStackEntryCount <= 1) {
-            var fragment = supportFragmentManager.fragments.get(0)
 
-            Log.v(TAG, "# of frags: ${supportFragmentManager.fragments.size}")
+            val count = supportFragmentManager.fragments.count()
+
+            val fragment = supportFragmentManager.fragments.get(count - 1)
 
             if (fragment != null) {
                 supportFragmentManager.beginTransaction().detach(fragment).commit()
             }
-        }
+
     }
 }
