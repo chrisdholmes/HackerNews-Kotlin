@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.faith.perseverance.hackernews.R
 import com.faith.perseverance.hackernews.model.ArticleViewModel
-import com.faith.perseverance.hackernews.model.ArticlesApplication
 
 /**
  * WebViewFragment displays selected url from articles
@@ -27,7 +26,7 @@ import com.faith.perseverance.hackernews.model.ArticlesApplication
  * so an article can be saved or shared using Sharesheet.
  *
  */
-class WebViewFragment(application: ArticlesApplication) : Fragment() {
+class WebViewFragment() : Fragment() {
 
     private var TAG = "WebViewFragment: "
 
@@ -35,8 +34,8 @@ class WebViewFragment(application: ArticlesApplication) : Fragment() {
 
     companion object {
 
-        fun newInstance(application: ArticlesApplication): WebViewFragment {
-            return WebViewFragment(application)
+        fun newInstance(): WebViewFragment {
+            return WebViewFragment()
         }
     }
 
@@ -55,6 +54,9 @@ class WebViewFragment(application: ArticlesApplication) : Fragment() {
 
         //inflate web_view_fragment.xml in to the Fragment
         val view: View = inflater.inflate(R.layout.web_view_fragment, container, false)
+
+        //set the action bar title with the name of the article
+        article?.let { (activity as HomeActvity).setActionBarTitle(it.title) }
 
         val webView = view.findViewById<WebView>(R.id.webView)
         webView.settings.javaScriptEnabled = true
@@ -142,5 +144,7 @@ class WebViewFragment(application: ArticlesApplication) : Fragment() {
         super.onPrepareOptionsMenu(menu)
 
     }
+
+
 
 }

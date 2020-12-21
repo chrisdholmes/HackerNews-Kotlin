@@ -5,13 +5,19 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime.now
+import java.time.Instant.now
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 class ArticleViewModel(private val repository: ArticleRepository): ViewModel() {
 
+
     val articles: MutableLiveData<List<Article>> by lazy {
         MutableLiveData<List<Article>>()
+    }
+
+    init {
+        getArticles()
     }
 
     val bookMarks: LiveData<List<Article>> = repository.bookMarks.asLiveData()
@@ -22,10 +28,6 @@ class ArticleViewModel(private val repository: ArticleRepository): ViewModel() {
         MutableLiveData<Article>()
    }
 
-    init{
-
-        getArticles()
-    }
 
     fun setArticleSelected(article: Article)
     {
@@ -44,6 +46,16 @@ class ArticleViewModel(private val repository: ArticleRepository): ViewModel() {
             addBookMark(articleSelected.value!!)
         }
     }
+    /*
+    TODO("update getArticles to use repository")
+    fun getArticles()
+    {
+        viewModelScope.launch {
+            repository.getArticles()
+            articles.postValue(repository.articles.value)
+        }
+    }
+    */
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -69,12 +81,20 @@ class ArticleViewModel(private val repository: ArticleRepository): ViewModel() {
 
     }
 
+
     fun addBookMark(article: Article) = viewModelScope.launch {
         repository.addBookMark(article)
     }
 
     fun deleteBookMark(article: Article) = viewModelScope.launch {
         repository.deleteBookMark(article)
+    }
+
+     fun deleteAll()
+    {
+        viewModelScope.launch {
+            repository.deleteAllBookMarks()
+        }
     }
 
 }

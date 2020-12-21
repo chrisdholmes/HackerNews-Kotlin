@@ -1,23 +1,23 @@
 package com.faith.perseverance.hackernews.model
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.annotation.WorkerThread
-import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
-import timber.log.Timber
+import kotlinx.coroutines.launch
+import java.time.Instant.now
 
 class ArticleRepository(private val articleDAO: ArticleDAO) {
 
     val bookMarks: Flow<List<Article>> = articleDAO.getBookmarks()
-
-    suspend fun updateArticles()
-    {
-        withContext(Dispatchers.IO)
-        {
-            Timber.d("updateArticles called from ArticleRepo")
-            var hits = HNApi.retrofitService.getProperties().hits
-        }
+    val articles: MutableLiveData<List<Article>> by lazy {
+        MutableLiveData<List<Article>>()
     }
+
+    private val TAG: String = "ArticleRepository: "
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun addBookMark(bookMark: Article)
@@ -29,6 +29,38 @@ class ArticleRepository(private val articleDAO: ArticleDAO) {
     suspend fun deleteBookMark(bookMark: Article)
     {
         articleDAO.deleteBookmark(bookMark)
+    }
+
+    @WorkerThread
+     suspend fun deleteAllBookMarks()
+    {
+        articleDAO.deleteAll()
+    }
+
+    //TODO("Update viewmodel to use this method")
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getArticles()
+    {
+        Log.v(TAG, "get articles ()")
+
+       coroutineScope {
+           launch {
+               try {
+                   Log.v(TAG, "coroutine launched - ${now()}")
+                   val hits = HNApi.retrofitService.getProperties().hits
+                   articles.postValue(hits)
+                   Log.v(TAG, "coroutine completed - ${now()}")
+
+
+               } catch (e: Exception) {
+
+                   Log.v(TAG, e.toString())
+                   Log.v(TAG, "coroutine failed - ${now()}")
+
+               }
+           }
+        }
+
     }
 
 }

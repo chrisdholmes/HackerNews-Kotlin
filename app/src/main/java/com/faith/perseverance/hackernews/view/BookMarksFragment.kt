@@ -15,9 +15,23 @@ import androidx.recyclerview.widget.RecyclerView
 import com.faith.perseverance.hackernews.R
 import com.faith.perseverance.hackernews.model.Article
 import com.faith.perseverance.hackernews.model.ArticleViewModel
-import com.faith.perseverance.hackernews.model.ArticlesApplication
 
-class BookMarksFragment(val application: Application, val supportFragmentManager: FragmentManager) : Fragment(), CellClickListener {
+/**
+ * BookMarksFragment displays a recyclerview of saved boomarks that are stored in the Room
+ * database locally on the device. The Application parameter is required so that the Fragment can access the
+ * viewmodel class. The supportFragmentManager parameter allows the Fragment to display a
+ * WebViewFragment with a link to the saved article.
+ *
+ * @param application
+ * @param supportFragmentManager
+ * @property viewModel
+ * @property articleAdapter
+ *
+ */
+
+class BookMarksFragment(val application: Application, val supportFragmentManager: FragmentManager) :
+        Fragment(), CellClickListener
+{
 
     private val viewModel by activityViewModels<ArticleViewModel>()
     private lateinit var articleAdapter: ArticleAdapter
@@ -39,9 +53,13 @@ class BookMarksFragment(val application: Application, val supportFragmentManager
         val view: View = inflater.inflate(R.layout.bookmarks_fragment, container, false)
 
 
+        (activity as HomeActvity).setActionBarTitle("Bookmarks")
+
         val recyclerView = view.findViewById<RecyclerView>(R.id.book_marks_view)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
+
+        //call back to observe changes in room database and update the UI
         val observer : Observer<List<Article>> =
                 object : Observer<List<Article>> {
                     override fun onChanged(bookMarks: List<Article>) {
@@ -58,11 +76,14 @@ class BookMarksFragment(val application: Application, val supportFragmentManager
         return view
     }
 
+
+    /* onCellClickListener passes the article selected from the recyclerview to the view model
+    * and then to webfrgament where it can be displayed. */
     override fun onCellClickListener(article: Article) {
         // initialize webfragment
-        val webfragment = WebViewFragment.newInstance(application as ArticlesApplication)
-        // generate fragment with bundle that contains url and title of article selected
+        val webfragment = WebViewFragment.newInstance()
 
+        // generate fragment with bundle that contains url and title of article selected
         viewModel.setArticleSelected(article)
 
         //push fragment to display if only 1 fragment is displayed (1 webviewfrag at at time)
@@ -83,15 +104,6 @@ class BookMarksFragment(val application: Application, val supportFragmentManager
         //hide save/bookmark button
         menu.findItem(R.id.action_bookmark).isVisible = false
 
-
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        activity?.run{
-
-        }
     }
 
 }

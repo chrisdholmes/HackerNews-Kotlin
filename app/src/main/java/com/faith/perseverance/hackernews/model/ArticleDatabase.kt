@@ -19,6 +19,9 @@ interface ArticleDAO {
     @Delete
     suspend fun deleteBookmark(bookmark: Article)
 
+    @Query("DELETE FROM articles")
+    suspend fun deleteAll()
+
 }
 
 @Database(entities = [Article::class], version = 4, exportSchema = false)
@@ -64,14 +67,11 @@ abstract class ArticleDatabase: RoomDatabase() {
         }
 
         suspend fun populateDatabase(articleDAO: ArticleDAO) {
-            // Delete all content here.
 
-            // Add sample words.
-            var article = Article("1234","The Billioniare Next Door", "https://www.medium.com/christopher-holmes")
+
+            var article = Article("1234","medium.com/christopher-holmes", "https://www.medium.com/christopher-holmes")
             articleDAO.addBookmark(article)
 
-
-            // TODO: Add your own words!
         }
     }
 

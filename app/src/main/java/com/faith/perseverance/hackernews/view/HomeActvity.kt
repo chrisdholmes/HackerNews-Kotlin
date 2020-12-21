@@ -2,7 +2,6 @@ package com.faith.perseverance.hackernews.view
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -28,9 +27,9 @@ import com.faith.perseverance.hackernews.model.ArticlesApplication
  *  Home Activity displays a bookmarks button in the actionbar
  *  for storing book marks.
  *
- *  @property viewModel
- *  @property articleAdapter
- *  @property TAG
+ *  @property viewModel ArticleViewModel
+ *  @property articleAdapter ArticleAdapter
+ *  @property TAG String
  */
 class HomeActvity : AppCompatActivity(), CellClickListener {
 
@@ -45,16 +44,17 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+
         setSupportActionBar(findViewById(R.id.my_toolbar))
-        supportActionBar?.title = "Hacker News"
+        supportActionBar?.title = "HackerNews"
 
         val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(baseContext)
 
+        //set the article of the adapter with updated data
         val observer : Observer<List<Article>> =
             object : Observer<List<Article>> {
             override fun onChanged(hits: List<Article>) {
-                Log.v(TAG, "on changed: ${hits}")
 
                 articleAdapter = ArticleAdapter(
                     hits,
@@ -66,11 +66,16 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         viewModel.articles.observe(this, observer)
     }
 
+    override fun onResume() {
+        super.onResume()
+        supportActionBar?.title = "HackerNews"
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCellClickListener(article: Article) {
 
         // initialize webfragment
-        val webfragment = WebViewFragment.newInstance(application as ArticlesApplication)
+        val webfragment = WebViewFragment.newInstance()
         // generate fragment with bundle that contains url and title of article selected
 
         viewModel.setArticleSelected(article)
@@ -93,7 +98,9 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.display_bookmarks -> {
             val bookMarksFragment = BookMarksFragment.newInstance(application, supportFragmentManager)
-            showFragment(bookMarksFragment)
+            bookMarksFragment.tag
+
+            showFragment(bookMarksFragment, "bookmark")
             true
         }
         else -> {
@@ -113,13 +120,14 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         return super.onCreateOptionsMenu(menu)
     }
 
-    private fun showFragment(fragment: Fragment)
+    private fun showFragment(fragment: Fragment, tag: String)
     {
         if(supportFragmentManager.backStackEntryCount < 1) {
             supportFragmentManager
                     .beginTransaction()
-                    .add(R.id.main_activity_layout, fragment)
+                    .add(R.id.main_activity_layout, fragment, tag)
                     .commit()
+
         }
 
     }
@@ -131,9 +139,28 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
 
             val fragment = supportFragmentManager.fragments.get(count - 1)
 
+
             if (fragment != null) {
                 supportFragmentManager.beginTransaction().detach(fragment).commit()
             }
 
+            //when one fragment is on the stack and it's hidden, the user sees the HomeActivity view.
+            //TODO("Update this based on tag")
+            if(count == 1)
+            {
+                supportActionBar?.title = "HackerNews"
+            }
+            //Bookmarks is only displayed when two fragments are in the stack and one is hidden
+            //TODO("Update this based on tag")
+            if(count == 2)
+            {
+                supportActionBar?.title = "Bookmarks"
+            }
+
+    }
+
+    fun setActionBarTitle(title: String)
+    {
+        supportActionBar?.title = title
     }
 }
