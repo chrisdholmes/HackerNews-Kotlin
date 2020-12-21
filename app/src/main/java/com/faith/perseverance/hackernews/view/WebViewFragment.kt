@@ -13,7 +13,9 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.faith.perseverance.hackernews.R
+import com.faith.perseverance.hackernews.model.ArticleViewModel
 
 /**
  * WebViewFragment displays selected url from articles
@@ -24,11 +26,11 @@ import com.faith.perseverance.hackernews.R
  * so an article can be saved or shared using Sharesheet.
  *
  */
-class WebViewFragment : Fragment() {
+class WebViewFragment() : Fragment() {
 
     private var TAG = "WebViewFragment: "
-    private var url: String? = null
-    private var title: String? = null
+
+    private val viewModel: ArticleViewModel by activityViewModels()
 
     companion object {
 
@@ -43,24 +45,18 @@ class WebViewFragment : Fragment() {
     }
 
     //3
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        //retrieve bundle
-        val bundle = arguments
-
-        //if bundle is not null - retrieve reference to article url and title
-        if(bundle != null) {
-            url = bundle.getString("url")
-            title = bundle.getString("title")
-        }
+        val article = viewModel.getArticleSelected()
 
         //inflate web_view_fragment.xml in to the Fragment
         val view: View = inflater.inflate(R.layout.web_view_fragment, container, false)
+
+        //set the action bar title with the name of the article
+        article?.let { (activity as HomeActvity).setActionBarTitle(it.title) }
 
         val webView = view.findViewById<WebView>(R.id.webView)
         webView.settings.javaScriptEnabled = true
@@ -90,7 +86,8 @@ class WebViewFragment : Fragment() {
             }
         })
 
-        webView.loadUrl(url)
+
+        webView.loadUrl(article?.url)
 
         return view
     }
@@ -103,6 +100,7 @@ class WebViewFragment : Fragment() {
      *
      * @param menu
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onPrepareOptionsMenu(menu: Menu) {
         //Display share button
         menu.findItem(R.id.action_share).isVisible = true
@@ -111,17 +109,18 @@ class WebViewFragment : Fragment() {
         //display save/bookmark button
         menu.findItem(R.id.action_bookmark).isVisible = true
 
-        var share = menu.findItem(R.id.action_share)
+        val share = menu.findItem(R.id.action_share)
 
+        val article = viewModel.getArticleSelected()
         //set the onclick listener of the share menu button to use Sharesheet
+
         share.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem?): Boolean {
-                if(url != null) {
-                    Log.v(TAG, url)
+                if(article != null) {
                     val shareSheet= Intent.createChooser(Intent().apply {
                         action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, url)
-                        putExtra(Intent.EXTRA_TITLE, title)
+                        putExtra(Intent.EXTRA_TEXT, article.url)
+                        putExtra(Intent.EXTRA_TITLE, article.title)
                         flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                         type="text/plain"
                     }, null)
@@ -130,7 +129,22 @@ class WebViewFragment : Fragment() {
                 return true
             }
         })
+
+        val save = menu.findItem(R.id.action_bookmark)
+
+        save.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onMenuItemClick(item: MenuItem?): Boolean {
+                viewModel.bookMarkSelectedArticle()
+
+                Toast.makeText(context, "Bookmarked: ${article?.title}", Toast.LENGTH_SHORT).show()
+                return true
+            }
+        })
         super.onPrepareOptionsMenu(menu)
+
     }
+
+
 
 }

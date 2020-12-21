@@ -1,5 +1,8 @@
 package com.faith.perseverance.hackernews.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
 /**
  * Hits is a class that contains a list of Articles.
  * Mimics the JSON values from network calls to
@@ -21,7 +24,9 @@ data class Hits(val hits: List<Article>)
  * @param url
  * @param points - (number of times the article was up voted)
  */
-data class Article(val objectID: String = "",
-                   val title: String = "",
-                   val url: String?,
-                   val points: Int = 0)
+@Entity(tableName = "articles")
+data class Article(
+    @PrimaryKey val objectID: String = "",
+    val title: String = "",
+    val url: String?,
+    val points: Int = 0)

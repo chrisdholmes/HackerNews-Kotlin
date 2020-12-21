@@ -22,7 +22,7 @@ class ArticleAdapter(private val data: List<Article>?, private val cellClickList
 {
     //private var TAG = "ArticleAdapter"
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
+     class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
     {
         //private var TAG = "ViewHolder"
         val articleTitle: TextView

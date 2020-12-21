@@ -2,18 +2,20 @@ package com.faith.perseverance.hackernews.view
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.faith.perseverance.hackernews.R
 import com.faith.perseverance.hackernews.model.Article
 import com.faith.perseverance.hackernews.model.ArticleViewModel
+import com.faith.perseverance.hackernews.model.ArticleViewModelFactory
+import com.faith.perseverance.hackernews.model.ArticlesApplication
 
 /**
  *  HomeActivity is the home page of the HackerNews App.
@@ -25,14 +27,16 @@ import com.faith.perseverance.hackernews.model.ArticleViewModel
  *  Home Activity displays a bookmarks button in the actionbar
  *  for storing book marks.
  *
- *  @property viewModel
- *  @property articleAdapter
- *  @property TAG
+ *  @property viewModel ArticleViewModel
+ *  @property articleAdapter ArticleAdapter
+ *  @property TAG String
  */
 class HomeActvity : AppCompatActivity(), CellClickListener {
 
     private var TAG: String = "OnCreate"
-    private val viewModel  by viewModels<ArticleViewModel>()
+    private val viewModel: ArticleViewModel by viewModels {
+        ArticleViewModelFactory((application as ArticlesApplication).repository)
+    }
     private lateinit var articleAdapter: ArticleAdapter
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -40,16 +44,17 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+
         setSupportActionBar(findViewById(R.id.my_toolbar))
-        supportActionBar?.title = "Hacker News"
+        supportActionBar?.title = "HackerNews"
 
         val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(baseContext)
 
+        //set the article of the adapter with updated data
         val observer : Observer<List<Article>> =
             object : Observer<List<Article>> {
             override fun onChanged(hits: List<Article>) {
-                Log.v(TAG, "on changed: ${hits}")
 
                 articleAdapter = ArticleAdapter(
                     hits,
@@ -61,18 +66,19 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         viewModel.articles.observe(this, observer)
     }
 
+    override fun onResume() {
+        super.onResume()
+        supportActionBar?.title = "HackerNews"
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCellClickListener(article: Article) {
 
-        //initialize a Bundle for storing article information
-        //function inherits from the custom OnCellClickListener interface in ArticleAdapter class
-        val bundle = Bundle()
-        bundle.putString("url", article.url)
-        bundle.putString("title",article.title)
-
         // initialize webfragment
-        var webfragment = WebViewFragment.newInstance()
+        val webfragment = WebViewFragment.newInstance()
         // generate fragment with bundle that contains url and title of article selected
-        webfragment.arguments = bundle
+
+        viewModel.setArticleSelected(article)
 
         //push fragment to display if only 1 fragment is displayed (1 webviewfrag at at time)
         if(supportFragmentManager.backStackEntryCount < 1) {
@@ -85,24 +91,19 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
 
     //on back pressed removes displayed fragment and returns to home page
     override fun onBackPressed() {
-
-        var fragment = supportFragmentManager.findFragmentByTag("webView")
-
-        Log.v(TAG, "# of frags: ${supportFragmentManager.fragments.size}")
-
-        if(fragment != null) {
-            supportFragmentManager.beginTransaction().detach(fragment).commit()
-        }
+        hideFragment()
     }
 
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.display_bookmarks -> {
-            // TODO(Display recyclerview of saved bookmarks in a fragment)
+            val bookMarksFragment = BookMarksFragment.newInstance(application, supportFragmentManager)
+            bookMarksFragment.tag
+
+            showFragment(bookMarksFragment, "bookmark")
             true
         }
         else -> {
-
             super.onOptionsItemSelected(item)
         }
     }
@@ -117,5 +118,49 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         share?.isVisible = false
 
         return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun showFragment(fragment: Fragment, tag: String)
+    {
+        if(supportFragmentManager.backStackEntryCount < 1) {
+            supportFragmentManager
+                    .beginTransaction()
+                    .add(R.id.main_activity_layout, fragment, tag)
+                    .commit()
+
+        }
+
+    }
+
+    private fun hideFragment()
+    {
+
+            val count = supportFragmentManager.fragments.count()
+
+            val fragment = supportFragmentManager.fragments.get(count - 1)
+
+
+            if (fragment != null) {
+                supportFragmentManager.beginTransaction().detach(fragment).commit()
+            }
+
+            //when one fragment is on the stack and it's hidden, the user sees the HomeActivity view.
+            //TODO("Update this based on tag")
+            if(count == 1)
+            {
+                supportActionBar?.title = "HackerNews"
+            }
+            //Bookmarks is only displayed when two fragments are in the stack and one is hidden
+            //TODO("Update this based on tag")
+            if(count == 2)
+            {
+                supportActionBar?.title = "Bookmarks"
+            }
+
+    }
+
+    fun setActionBarTitle(title: String)
+    {
+        supportActionBar?.title = title
     }
 }
