@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.time.Instant.now
 
 
@@ -27,6 +28,14 @@ class ArticleViewModel(private val repository: ArticleRepository): ViewModel() {
     val articleSelected: MutableLiveData<Article> by lazy {
         MutableLiveData<Article>()
    }
+
+    fun deleteArticleSelected()
+    {
+        Log.v(TAG, "${articleSelected.value}")
+        viewModelScope.launch {
+            articleSelected.value?.let { repository.deleteBookMark(it) }
+        }
+    }
 
 
     fun setArticleSelected(article: Article)
@@ -59,25 +68,24 @@ class ArticleViewModel(private val repository: ArticleRepository): ViewModel() {
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getArticles()
-    {
-        Log.v(TAG, "get articles ()")
+    fun getArticles() {
+        Timber.tag(TAG).v("get articles ()")
 
-            viewModelScope.launch {
-                try {
-                    Log.v(TAG, "coroutine launched - ${now()}")
-                    val hits = HNApi.retrofitService.getProperties().hits
-                    articles.postValue(hits)
-                    Log.v(TAG, "coroutine completed - ${now()}")
-                    Log.v(TAG, "test: ${articles.value}")
+        viewModelScope.launch {
+            try {
+                Timber.tag(TAG).v("coroutine launched - ${now()}")
+                val hits = HNApi.retrofitService.getProperties().hits
+                articles.postValue(hits)
+                Log.v(TAG, "coroutine completed - ${now()}")
+                Log.v(TAG, "test: ${articles.value}")
 
-                } catch (e: Exception) {
+            } catch (e: Exception) {
 
-                    Log.v(TAG, e.toString())
-                    Log.v(TAG, "coroutine failed - ${now()}")
+                Log.v(TAG, e.toString())
+                Log.v(TAG, "coroutine failed - ${now()}")
 
-                }
             }
+        }
 
     }
 

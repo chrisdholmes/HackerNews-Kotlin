@@ -50,19 +50,16 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
 
         val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(baseContext)
+        var adapter  = ArticleAdapter(this, application)
+        recyclerView.adapter = adapter
 
         //set the article of the adapter with updated data
         val observer : Observer<List<Article>> =
             object : Observer<List<Article>> {
-            override fun onChanged(hits: List<Article>) {
-
-                articleAdapter = ArticleAdapter(
-                    hits,
-                    this@HomeActvity
-                )
-                recyclerView.adapter = articleAdapter
+                override fun onChanged(hits: List<Article>) {
+                    adapter.addHits(hits.toMutableList())
+                }
             }
-        }
         viewModel.articles.observe(this, observer)
     }
 
@@ -76,7 +73,6 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
 
         // initialize webfragment
         val webfragment = WebViewFragment.newInstance()
-        // generate fragment with bundle that contains url and title of article selected
 
         viewModel.setArticleSelected(article)
 
@@ -89,11 +85,11 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         }
     }
 
+
     //on back pressed removes displayed fragment and returns to home page
     override fun onBackPressed() {
         hideFragment()
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.display_bookmarks -> {
@@ -129,14 +125,15 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
                     .commit()
 
         }
-
     }
 
     private fun hideFragment()
     {
-
             val count = supportFragmentManager.fragments.count()
-
+            if(count == 0)
+            {
+                return;
+            }
             val fragment = supportFragmentManager.fragments.get(count - 1)
 
 

@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.faith.perseverance.hackernews.R
@@ -57,20 +58,40 @@ class BookMarksFragment(val application: Application, val supportFragmentManager
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.book_marks_view)
         recyclerView.layoutManager = LinearLayoutManager(context)
+        articleAdapter = ArticleAdapter(this@BookMarksFragment, application)
+
+        recyclerView.adapter = articleAdapter
+
 
 
         //call back to observe changes in room database and update the UI
         val observer : Observer<List<Article>> =
                 object : Observer<List<Article>> {
                     override fun onChanged(bookMarks: List<Article>) {
-
-                        articleAdapter = ArticleAdapter(
-                                bookMarks,
-                                this@BookMarksFragment
-                        )
+                        articleAdapter.data = bookMarks.toMutableList()
                         recyclerView.adapter = articleAdapter
+
                     }
                 }
+
+        val swipeHandler = object : SwipeToDeleteCallback(context = application.applicationContext)
+        {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                super.onSwiped(viewHolder, direction)
+
+                //retrieve reference to the article was removed from the recyclerview after being swiped.
+                var article = articleAdapter.removeAt(viewHolder.adapterPosition)
+
+                //if the article is not null, delete the article from the local Room DB
+                article?.let { viewModel.deleteBookMark(it) }
+
+            }
+        }
+
+
+        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+
         viewModel.bookMarks.observe(viewLifecycleOwner, observer)
 
         return view
@@ -95,6 +116,8 @@ class BookMarksFragment(val application: Application, val supportFragmentManager
         }
     }
 
+
+    // onPrepareOptionsMenu is used to hide the bottom available when the BookMarks are displayed
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         //hide share button

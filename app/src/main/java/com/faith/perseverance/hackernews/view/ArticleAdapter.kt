@@ -1,5 +1,6 @@
 package com.faith.perseverance.hackernews.view
 
+import android.app.Application
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,9 +19,12 @@ import com.faith.perseverance.hackernews.model.Article
  * @param cellClickListener CellClickListener
  */
 
-class ArticleAdapter(private val data: List<Article>?, private val cellClickListener: CellClickListener): RecyclerView.Adapter<ArticleAdapter.ViewHolder>()
+class ArticleAdapter(private val cellClickListener: CellClickListener, application: Application): RecyclerView.Adapter<ArticleAdapter.ViewHolder>()
 {
-    //private var TAG = "ArticleAdapter"
+     var data: MutableList<Article>? = null
+     private var TAG: String = "Adapter"
+
+
 
      class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
     {
@@ -35,6 +39,12 @@ class ArticleAdapter(private val data: List<Article>?, private val cellClickList
             linearlayout = view.findViewById(R.id.linearlayout)
         }
 
+    }
+
+    fun addHits(hits: MutableList<Article>)
+    {
+        data = hits
+        notifyDataSetChanged()
     }
 
     //Creates new views (invoked by the layout manager)
@@ -56,9 +66,9 @@ class ArticleAdapter(private val data: List<Article>?, private val cellClickList
         var article = Article(url = "https://www.google.com")
 
         if(data != null) {
-            title = data.get(position).title
-            points = "Points: ${data.get(position).points}"
-            article = data.get(position)
+            title = data!!.get(position).title
+            points = "Points: ${data!!.get(position).points}"
+            article = data!!.get(position)
         } else {
             title = "Something went wrong ... "
         }
@@ -68,17 +78,35 @@ class ArticleAdapter(private val data: List<Article>?, private val cellClickList
         viewHolder.linearlayout.setOnClickListener{
             cellClickListener.onCellClickListener(article)
         }
+
     }
 
     override fun getItemCount(): Int {
         if (data != null) {
-            return data.size
+            return data!!.size
         } else {
             return 1
         }
     }
+
+    fun removeAt(position: Int): Article?
+    {
+            //retrieve reference to article from data
+            var article = data?.get(position)
+            //remove article from data
+            data?.removeAt(position)
+            //update recyclerView
+            notifyDataSetChanged()
+
+            return article
+    }
+
 }
 
+/**
+ * CellClickListener interface provides delegate pattern between the articl
+ */
 interface CellClickListener{
     fun onCellClickListener(article: Article)
+
 }
