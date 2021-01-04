@@ -4,11 +4,11 @@ import android.app.Application
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
-class ArticlesApplication: Application() {
+class ArticlesApplication : Application() {
 
     val applicationScope = CoroutineScope(SupervisorJob())
 
-    val database by lazy {ArticleDatabase.getDatabase(this, applicationScope)}
+    val database by lazy { ArticleDatabase.getDatabase(this, applicationScope) }
 
-    val repository by lazy {ArticleRepository(database.articleDAO())}
+    val repository by lazy { ArticleRepository(database.articleDAO()) }
 }

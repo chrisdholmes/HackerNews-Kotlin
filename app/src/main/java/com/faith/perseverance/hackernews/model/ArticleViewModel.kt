@@ -5,13 +5,10 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import java.time.Instant.now
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-class ArticleViewModel(private val repository: ArticleRepository): ViewModel() {
-
+class ArticleViewModel(private val repository: ArticleRepository) : ViewModel() {
 
     val articles: MutableLiveData<List<Article>> by lazy {
         MutableLiveData<List<Article>>()
@@ -27,68 +24,35 @@ class ArticleViewModel(private val repository: ArticleRepository): ViewModel() {
 
     val articleSelected: MutableLiveData<Article> by lazy {
         MutableLiveData<Article>()
-   }
-
-    fun deleteArticleSelected()
-    {
-        Log.v(TAG, "${articleSelected.value}")
-        viewModelScope.launch {
-            articleSelected.value?.let { repository.deleteBookMark(it) }
-        }
     }
 
-
-    fun setArticleSelected(article: Article)
-    {
+    fun setArticleSelected(article: Article) {
         articleSelected.value = article
     }
 
-    fun getArticleSelected(): Article?
-    {
+    fun getArticleSelected(): Article? {
         return articleSelected.value
     }
 
-    fun bookMarkSelectedArticle()
-    {
-        if(articleSelected.value != null)
-        {
+    fun bookMarkSelectedArticle() {
+        if (articleSelected.value != null) {
             addBookMark(articleSelected.value!!)
         }
     }
-    /*
-    TODO("update getArticles to use repository")
+
+
     fun getArticles()
     {
         viewModelScope.launch {
-            repository.getArticles()
-            articles.postValue(repository.articles.value)
-        }
-    }
-    */
 
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun getArticles() {
-        Timber.tag(TAG).v("get articles ()")
-
-        viewModelScope.launch {
             try {
-                Timber.tag(TAG).v("coroutine launched - ${now()}")
-                val hits = HNApi.retrofitService.getProperties().hits
-                articles.postValue(hits)
-                Log.v(TAG, "coroutine completed - ${now()}")
-                Log.v(TAG, "test: ${articles.value}")
-
+                repository.getArticles()
+                articles.postValue(repository.articles.value)
             } catch (e: Exception) {
-
                 Log.v(TAG, e.toString())
-                Log.v(TAG, "coroutine failed - ${now()}")
-
             }
         }
-
     }
-
 
     fun addBookMark(article: Article) = viewModelScope.launch {
         repository.addBookMark(article)
@@ -98,8 +62,7 @@ class ArticleViewModel(private val repository: ArticleRepository): ViewModel() {
         repository.deleteBookMark(article)
     }
 
-     fun deleteAll()
-    {
+    fun deleteAll() {
         viewModelScope.launch {
             repository.deleteAllBookMarks()
         }

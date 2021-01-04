@@ -26,7 +26,7 @@ data class Hits(val hits: List<Article>)
  */
 @Entity(tableName = "articles")
 data class Article(
-    @PrimaryKey val objectID: String = "",
-    val title: String = "",
-    val url: String?,
-    val points: Int = 0)
+        @PrimaryKey val objectID: String = "",
+        val title: String = "",
+        val url: String?,
+        val points: Int = 0)

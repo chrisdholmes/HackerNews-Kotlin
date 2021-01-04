@@ -11,14 +11,14 @@ private const val URL = "https://hn.algolia.com/api/v1/"
 
 //Moshi is a 3rd party library that conversts JSON to objects
 private val moshi = Moshi.Builder()
-    .add(KotlinJsonAdapterFactory())
-    .build()
+        .add(KotlinJsonAdapterFactory())
+        .build()
 
 //Retrofit is a 3rd party library that makes network requests
 private val retrofit = Retrofit.Builder()
-    .addConverterFactory(MoshiConverterFactory.create(moshi))
-    .baseUrl(URL)
-    .build()
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .baseUrl(URL)
+        .build()
 
 
 interface HNApiService {
@@ -29,6 +29,7 @@ interface HNApiService {
 
 //Singleton for ViewModel/Repositories to use to retrieve data
 object HNApi {
-    val retrofitService : HNApiService by lazy {
-        retrofit.create(HNApiService::class.java) }
+    val retrofitService: HNApiService by lazy {
+        retrofit.create(HNApiService::class.java)
+    }
 }

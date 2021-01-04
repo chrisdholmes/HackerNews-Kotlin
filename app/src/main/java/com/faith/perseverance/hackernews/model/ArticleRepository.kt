@@ -18,48 +18,39 @@ class ArticleRepository(private val articleDAO: ArticleDAO) {
     }
 
     private val TAG: String = "ArticleRepository: "
+
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun addBookMark(bookMark: Article)
-    {
+    suspend fun addBookMark(bookMark: Article) {
         articleDAO.addBookmark(bookMark)
     }
 
     @WorkerThread
-    suspend fun deleteBookMark(bookMark: Article)
-    {
+    suspend fun deleteBookMark(bookMark: Article) {
         articleDAO.deleteBookmark(bookMark)
     }
 
     @WorkerThread
-     suspend fun deleteAllBookMarks()
-    {
+    suspend fun deleteAllBookMarks() {
         articleDAO.deleteAll()
     }
 
-    //TODO("Update viewmodel to use this method")
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun getArticles()
-    {
-        Log.v(TAG, "get articles ()")
-
-       coroutineScope {
-           launch {
-               try {
-                   Log.v(TAG, "coroutine launched - ${now()}")
-                   val hits = HNApi.retrofitService.getProperties().hits
-                   articles.postValue(hits)
-                   Log.v(TAG, "coroutine completed - ${now()}")
-
-
-               } catch (e: Exception) {
-
-                   Log.v(TAG, e.toString())
-                   Log.v(TAG, "coroutine failed - ${now()}")
-
-               }
-           }
+    suspend fun getArticles() {
+        var hits = listOf<Article>()
+        coroutineScope {
+            launch {
+                try {
+                    Log.v(TAG, "coroutine launched - ${now()}")
+                    hits = HNApi.retrofitService.getProperties().hits
+                } catch (e: Exception) {
+                    Log.v(TAG, e.toString())
+                    Log.v(TAG, "coroutine failed - ${now()}")
+                }
+            }
         }
+        articles.value = hits
+        Log.v(TAG, "coroutine completed - ${now()} ${articles.value}")
 
     }
 

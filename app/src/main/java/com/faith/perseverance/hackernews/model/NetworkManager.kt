@@ -33,7 +33,4 @@ class NetworkManager(val context: Context) {
     }
 
 
-
-
-
 }

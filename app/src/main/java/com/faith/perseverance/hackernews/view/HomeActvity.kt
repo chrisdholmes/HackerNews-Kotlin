@@ -44,30 +44,29 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-
         setSupportActionBar(findViewById(R.id.my_toolbar))
         supportActionBar?.title = "HackerNews"
 
         val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(baseContext)
-        var adapter  = ArticleAdapter(this, application)
+        var adapter = ArticleAdapter(this)
         recyclerView.adapter = adapter
 
         //set the article of the adapter with updated data
-        val observer : Observer<List<Article>> =
-            object : Observer<List<Article>> {
-                override fun onChanged(hits: List<Article>) {
-                    adapter.addHits(hits.toMutableList())
+        val observer: Observer<List<Article>?> =
+                object : Observer<List<Article>?> {
+                    override fun onChanged(hits: List<Article>?) {
+                        adapter.addHits(hits?.toMutableList())
+                    }
                 }
-            }
         viewModel.articles.observe(this, observer)
     }
 
-    override fun onResume() {
-        super.onResume()
-        supportActionBar?.title = "HackerNews"
-    }
-
+    /**
+     * onCellClickListener provides access to the article that is selected
+     * from the recyclerview's adapter. When a user selects a article
+     * in the adapter, this method provides the HomeActivity with access ot the article.
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCellClickListener(article: Article) {
 
@@ -77,7 +76,7 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         viewModel.setArticleSelected(article)
 
         //push fragment to display if only 1 fragment is displayed (1 webviewfrag at at time)
-        if(supportFragmentManager.backStackEntryCount < 1) {
+        if (supportFragmentManager.backStackEntryCount < 1) {
             supportFragmentManager
                     .beginTransaction()
                     .add(R.id.main_activity_layout, webfragment, "webView")
@@ -116,48 +115,41 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         return super.onCreateOptionsMenu(menu)
     }
 
-    private fun showFragment(fragment: Fragment, tag: String)
-    {
-        if(supportFragmentManager.backStackEntryCount < 1) {
+    private fun showFragment(fragment: Fragment, tag: String) {
+        if (supportFragmentManager.backStackEntryCount < 1) {
             supportFragmentManager
                     .beginTransaction()
                     .add(R.id.main_activity_layout, fragment, tag)
                     .commit()
-
         }
     }
 
-    private fun hideFragment()
-    {
-            val count = supportFragmentManager.fragments.count()
-            if(count == 0)
-            {
-                return;
-            }
-            val fragment = supportFragmentManager.fragments.get(count - 1)
+    private fun hideFragment() {
 
+        var count = supportFragmentManager.fragments.size
 
-            if (fragment != null) {
-                supportFragmentManager.beginTransaction().detach(fragment).commit()
-            }
+        //if any fragments are displayed - return
+        if(count == 0)
+        {
+            return;
+        }
+        //if there is only one fragment in the stack - then we are back in homeactivity - set actionbar
+        //to app name
+        else if(count == 1)
+        {
+            supportActionBar?.title = "HackerNews"
+        }
 
-            //when one fragment is on the stack and it's hidden, the user sees the HomeActivity view.
-            //TODO("Update this based on tag")
-            if(count == 1)
-            {
-                supportActionBar?.title = "HackerNews"
-            }
-            //Bookmarks is only displayed when two fragments are in the stack and one is hidden
-            //TODO("Update this based on tag")
-            if(count == 2)
-            {
-                supportActionBar?.title = "Bookmarks"
-            }
+        //grab the top fragment in the stack
+        var fragment = supportFragmentManager.fragments[count - 1]
 
+        //if fragment is not null - remove fragment
+        if (fragment != null) {
+            supportFragmentManager.beginTransaction().detach(fragment).commit()
+        }
     }
 
-    fun setActionBarTitle(title: String)
-    {
+    fun setActionBarTitle(title: String) {
         supportActionBar?.title = title
     }
 }

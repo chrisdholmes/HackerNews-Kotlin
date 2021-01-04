@@ -1,6 +1,5 @@
 package com.faith.perseverance.hackernews.view
 
-import android.app.Application
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,15 +18,12 @@ import com.faith.perseverance.hackernews.model.Article
  * @param cellClickListener CellClickListener
  */
 
-class ArticleAdapter(private val cellClickListener: CellClickListener, application: Application): RecyclerView.Adapter<ArticleAdapter.ViewHolder>()
-{
-     var data: MutableList<Article>? = null
-     private var TAG: String = "Adapter"
+class ArticleAdapter(private val cellClickListener: CellClickListener) : RecyclerView.Adapter<ArticleAdapter.ViewHolder>() {
+    var data: MutableList<Article>? = null
+    private var TAG: String = "Adapter"
 
 
-
-     class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
-    {
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         //private var TAG = "ViewHolder"
         val articleTitle: TextView
         val articlePoints: TextView
@@ -41,9 +37,10 @@ class ArticleAdapter(private val cellClickListener: CellClickListener, applicati
 
     }
 
-    fun addHits(hits: MutableList<Article>)
-    {
-        data = hits
+    fun addHits(hits: MutableList<Article>?) {
+        if(hits != null) {
+            data = hits
+        }
         notifyDataSetChanged()
     }
 
@@ -65,7 +62,7 @@ class ArticleAdapter(private val cellClickListener: CellClickListener, applicati
         var url = ""
         var article = Article(url = "https://www.google.com")
 
-        if(data != null) {
+        if (data != null) {
             title = data!!.get(position).title
             points = "Points: ${data!!.get(position).points}"
             article = data!!.get(position)
@@ -75,7 +72,7 @@ class ArticleAdapter(private val cellClickListener: CellClickListener, applicati
         viewHolder.articleTitle.text = title
         viewHolder.articlePoints.text = points
 
-        viewHolder.linearlayout.setOnClickListener{
+        viewHolder.linearlayout.setOnClickListener {
             cellClickListener.onCellClickListener(article)
         }
 
@@ -89,16 +86,15 @@ class ArticleAdapter(private val cellClickListener: CellClickListener, applicati
         }
     }
 
-    fun removeAt(position: Int): Article?
-    {
-            //retrieve reference to article from data
-            var article = data?.get(position)
-            //remove article from data
-            data?.removeAt(position)
-            //update recyclerView
-            notifyDataSetChanged()
+    fun removeAt(position: Int): Article? {
+        //retrieve reference to article from data
+        var article = data?.get(position)
+        //remove article from data
+        data?.removeAt(position)
+        //update recyclerView
+        notifyDataSetChanged()
 
-            return article
+        return article
     }
 
 }
@@ -106,7 +102,7 @@ class ArticleAdapter(private val cellClickListener: CellClickListener, applicati
 /**
  * CellClickListener interface provides delegate pattern between the articl
  */
-interface CellClickListener{
+interface CellClickListener {
     fun onCellClickListener(article: Article)
 
 }

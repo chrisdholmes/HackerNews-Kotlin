@@ -1,6 +1,7 @@
 package com.faith.perseverance.hackernews.view
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -26,7 +27,7 @@ import com.faith.perseverance.hackernews.model.ArticleViewModel
  * so an article can be saved or shared using Sharesheet.
  *
  */
-class WebViewFragment() : Fragment() {
+class WebViewFragment : Fragment() {
 
     private var TAG = "WebViewFragment: "
 
@@ -48,7 +49,7 @@ class WebViewFragment() : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val article = viewModel.getArticleSelected()
 
@@ -62,13 +63,13 @@ class WebViewFragment() : Fragment() {
         webView.settings.javaScriptEnabled = true
         webView.canGoBack()
 
-        webView.setWebViewClient(object : WebViewClient() {
+        webView.webViewClient = object : WebViewClient() {
 
             @RequiresApi(Build.VERSION_CODES.M)
             override fun onReceivedError(
-                view: WebView?,
-                request: WebResourceRequest?,
-                error: WebResourceError?
+                    view: WebView?,
+                    request: WebResourceRequest?,
+                    error: WebResourceError?
             ) {
                 super.onReceivedError(view, request, error)
 
@@ -76,20 +77,26 @@ class WebViewFragment() : Fragment() {
 
                 if (error != null) {
                     Toast.makeText(
-                        activity?.baseContext,
-                        "FAILED: ${error.description}",
-                        Toast.LENGTH_SHORT
+                            activity?.baseContext,
+                            "FAILED: ${error.description}",
+                            Toast.LENGTH_SHORT
                     ).show()
                 }
                 activity?.supportFragmentManager?.beginTransaction()?.remove(this@WebViewFragment)
-                    ?.commit()
+                        ?.commit()
             }
-        })
+        }
 
 
         webView.loadUrl(article?.url)
 
         return view
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        var title = viewModel.articleSelected.value?.title
+        title?.let { (activity as HomeActvity).setActionBarTitle(it) }
     }
 
     /**
@@ -116,13 +123,13 @@ class WebViewFragment() : Fragment() {
 
         share.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem?): Boolean {
-                if(article != null) {
-                    val shareSheet= Intent.createChooser(Intent().apply {
+                if (article != null) {
+                    val shareSheet = Intent.createChooser(Intent().apply {
                         action = Intent.ACTION_SEND
                         putExtra(Intent.EXTRA_TEXT, article.url)
                         putExtra(Intent.EXTRA_TITLE, article.title)
                         flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        type="text/plain"
+                        type = "text/plain"
                     }, null)
                     startActivity(shareSheet)
                 }
@@ -144,7 +151,6 @@ class WebViewFragment() : Fragment() {
         super.onPrepareOptionsMenu(menu)
 
     }
-
 
 
 }

@@ -25,7 +25,7 @@ interface ArticleDAO {
 }
 
 @Database(entities = [Article::class], version = 4, exportSchema = false)
-abstract class ArticleDatabase: RoomDatabase() {
+abstract class ArticleDatabase : RoomDatabase() {
     abstract fun articleDAO(): ArticleDAO
 
     companion object {
@@ -35,7 +35,7 @@ abstract class ArticleDatabase: RoomDatabase() {
         private var INSTANCE: ArticleDatabase? = null
 
         fun getDatabase(context: Context,
-        scope: CoroutineScope
+                        scope: CoroutineScope
         ): ArticleDatabase {
             // if the INSTANCE is not null, then return it,
             // if it is, then create the database
@@ -45,7 +45,7 @@ abstract class ArticleDatabase: RoomDatabase() {
                         ArticleDatabase::class.java,
                         "articles_db"
                 ).addCallback(ArticleDatabaseCallback(scope))
-                    .build()
+                        .build()
                 INSTANCE = instance
                 // return instance
                 instance
@@ -54,7 +54,7 @@ abstract class ArticleDatabase: RoomDatabase() {
     }
 
     private class ArticleDatabaseCallback(
-        private val scope: CoroutineScope
+            private val scope: CoroutineScope
     ) : RoomDatabase.Callback() {
 
         override fun onCreate(db: SupportSQLiteDatabase) {
@@ -68,13 +68,11 @@ abstract class ArticleDatabase: RoomDatabase() {
 
         suspend fun populateDatabase(articleDAO: ArticleDAO) {
 
-
-            var article = Article("1234","medium.com/christopher-holmes", "https://www.medium.com/christopher-holmes")
+            var article = Article("1234", "medium.com/christopher-holmes", "https://www.medium.com/christopher-holmes")
             articleDAO.addBookmark(article)
 
         }
     }
-
 
 
 }

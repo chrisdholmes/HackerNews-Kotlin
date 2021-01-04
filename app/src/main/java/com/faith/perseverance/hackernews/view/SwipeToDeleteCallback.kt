@@ -14,13 +14,13 @@ import com.faith.perseverance.hackernews.R
  */
 
 
-open class SwipeToDeleteCallback(context: Context): ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+open class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
     private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_delete_white_24)
-    private var intrinsicWidth =  0
+    private var intrinsicWidth = 0
     private var intrinsicHeight = 0
 
-    init{
-        if(deleteIcon != null) {
+    init {
+        if (deleteIcon != null) {
             intrinsicHeight = deleteIcon.intrinsicHeight
             intrinsicWidth = deleteIcon.intrinsicWidth
         } else {
@@ -83,6 +83,6 @@ open class SwipeToDeleteCallback(context: Context): ItemTouchHelper.SimpleCallba
 
     private fun clearCanvas(c: Canvas?, left: Float, top: Float, right: Float, bottom: Float) {
         c?.drawRect(left, top, right, bottom, clearPaint)
-    } 
+    }
 
 }
