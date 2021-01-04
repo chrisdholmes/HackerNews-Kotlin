@@ -16,6 +16,7 @@ When the WebViewFragment is open the user can use the ActionBar to share or save
 ![Sharesheet image](https://github.com/chrisdholmes/HackerNews-Kotlin/blob/main/ShareSheet-image.png)
 
 
-The BookMarksFragment allows users to review old BookMarks.
+The BookMarksFragment allows users to review and delete saved BookMarks. Bookmarks are
+persisted locally in a Room DB.
 
 ![alt text](https://github.com/chrisdholmes/HackerNews-Kotlin/blob/main/Bookmarks-image.png)
