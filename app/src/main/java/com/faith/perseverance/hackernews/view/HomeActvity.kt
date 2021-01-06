@@ -124,29 +124,42 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         }
     }
 
-    private fun hideFragment() {
+    //TODO replace with a NavigationComponent
+    /*
+       hideFragment() - sets the action bar tilte based on the number of fragments
+       that are in the supportFragmentManager.
 
+       If there are two fragments in the stack - then the title is set to bookmarks when the user
+       goes back because that's the only state that would allow this to happen.
+
+       If there is one fragment and the user goes back then the app name is displayed
+       in the in action.
+
+       This needs to be replaced with something more scalable.
+     */
+    private fun hideFragment() {
         var count = supportFragmentManager.fragments.size
 
-        //if any fragments are displayed - return
-        if(count == 0)
-        {
-            return;
-        }
-        //if there is only one fragment in the stack - then we are back in homeactivity - set actionbar
-        //to app name
-        else if(count == 1)
-        {
-            supportActionBar?.title = "HackerNews"
-        }
-
-        //grab the top fragment in the stack
         var fragment = supportFragmentManager.fragments[count - 1]
 
-        //if fragment is not null - remove fragment
-        if (fragment != null) {
-            supportFragmentManager.beginTransaction().detach(fragment).commit()
+        if(fragment != null) {
+            supportFragmentManager.beginTransaction()
+                    .detach(fragment)
+                    .commit()
         }
+
+        if(count == 0) {
+            return;
+        }
+        else if(count == 1)
+        {
+            setActionBarTitle("HackerNews")
+        } else if(count == 2)
+        {
+            setActionBarTitle("Bookmarks")
+        }
+
+
     }
 
     fun setActionBarTitle(title: String) {
