@@ -1,12 +1,15 @@
 package com.faith.perseverance.hackernews.view
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
@@ -50,10 +53,12 @@ class BookMarksFragment(val application: Application, val supportFragmentManager
         setHasOptionsMenu(true)
     }
 
+    @SuppressLint("NewApi")
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view: View = inflater.inflate(R.layout.bookmarks_fragment, container, false)
 
-        (activity as HomeActvity).setActionBarTitle("Bookmarks")
+        (activity as HomeActivity).setActionBarTitle("Bookmarks")
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.book_marks_view)
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -73,6 +78,7 @@ class BookMarksFragment(val application: Application, val supportFragmentManager
                 }
 
         val swipeHandler = object : SwipeToDeleteCallback(context = application.applicationContext) {
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 super.onSwiped(viewHolder, direction)
 
@@ -97,6 +103,8 @@ class BookMarksFragment(val application: Application, val supportFragmentManager
 
     /* onCellClickListener passes the article selected from the recyclerview to the view model
     * and then to webfrgament where it can be displayed. */
+    @SuppressLint("NewApi")
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCellClickListener(article: Article) {
         // initialize webfragment
         val webfragment = WebViewFragment.newInstance()

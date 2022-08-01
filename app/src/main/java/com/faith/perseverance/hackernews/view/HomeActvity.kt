@@ -31,9 +31,9 @@ import com.faith.perseverance.hackernews.model.ArticlesApplication
  *  @property articleAdapter ArticleAdapter
  *  @property TAG String
  */
-class HomeActvity : AppCompatActivity(), CellClickListener {
+class HomeActivity : AppCompatActivity(), CellClickListener {
 
-    private var TAG: String = "OnCreate"
+    private val TAG: String = "HomeActivity"
     private val viewModel: ArticleViewModel by viewModels {
         ArticleViewModelFactory((application as ArticlesApplication).repository)
     }
@@ -45,20 +45,17 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         setContentView(R.layout.activity_home)
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
-        supportActionBar?.title = "HackerNews"
+
+        supportActionBar?.title = getString(R.string.app_name)
 
         val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(baseContext)
-        var adapter = ArticleAdapter(this)
+        val adapter = ArticleAdapter(this)
         recyclerView.adapter = adapter
 
         //set the article of the adapter with updated data
         val observer: Observer<List<Article>?> =
-                object : Observer<List<Article>?> {
-                    override fun onChanged(hits: List<Article>?) {
-                        adapter.addHits(hits?.toMutableList())
-                    }
-                }
+            Observer<List<Article>?> { hits -> adapter.addHits(hits?.toMutableList()) }
         viewModel.articles.observe(this, observer)
     }
 
@@ -71,7 +68,7 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
     override fun onCellClickListener(article: Article) {
 
         // initialize webfragment
-        val webfragment = WebViewFragment.newInstance()
+        val webFragment = WebViewFragment.newInstance()
 
         viewModel.setArticleSelected(article)
 
@@ -79,7 +76,7 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         if (supportFragmentManager.backStackEntryCount < 1) {
             supportFragmentManager
                     .beginTransaction()
-                    .add(R.id.main_activity_layout, webfragment, "webView")
+                    .add(R.id.main_activity_layout, webFragment, getString(R.string.webviewtag))
                     .commit()
         }
     }
@@ -119,14 +116,14 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         if (supportFragmentManager.backStackEntryCount < 1) {
             supportFragmentManager
                     .beginTransaction()
-                    .add(R.id.main_activity_layout, fragment, tag)
+                    .add(R.id.fragment_placeholder, fragment, tag)
                     .commit()
         }
     }
 
     //TODO replace with a NavigationComponent
     /*
-       hideFragment() - sets the action bar tilte based on the number of fragments
+       hideFragment() - sets the action bar title based on the number of fragments
        that are in the supportFragmentManager.
 
        If there are two fragments in the stack - then the title is set to bookmarks when the user
@@ -138,9 +135,13 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
        This needs to be replaced with something more scalable.
      */
     private fun hideFragment() {
-        var count = supportFragmentManager.fragments.size
+        val count = supportFragmentManager.fragments.size
 
-        var fragment = supportFragmentManager.fragments[count - 1]
+        if(count == 0 )
+        {
+            return
+        }
+        val fragment = supportFragmentManager.fragments[count - 1]
 
         if(fragment != null) {
             supportFragmentManager.beginTransaction()
@@ -149,7 +150,7 @@ class HomeActvity : AppCompatActivity(), CellClickListener {
         }
 
         if(count == 0) {
-            return;
+            return
         }
         else if(count == 1)
         {

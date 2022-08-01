@@ -19,12 +19,10 @@
         tools:ignore="UnusedAttribute"
         tools:targetApi="m">
 
-        <activity android:name=".view.HomeActvity"
-                  >
+        <activity android:name=".view.HomeActivity"
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"
-                        />
-
+                <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

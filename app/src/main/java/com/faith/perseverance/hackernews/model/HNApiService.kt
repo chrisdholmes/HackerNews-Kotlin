@@ -9,7 +9,7 @@ import retrofit2.http.GET
 //Base url for HTTP Request
 private const val URL = "https://hn.algolia.com/api/v1/"
 
-//Moshi is a 3rd party library that conversts JSON to objects
+//Moshi is a 3rd party library that converts JSON to objects
 private val moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
         .build()

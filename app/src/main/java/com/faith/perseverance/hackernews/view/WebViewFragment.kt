@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.faith.perseverance.hackernews.R
 import com.faith.perseverance.hackernews.model.ArticleViewModel
+import timber.log.Timber
 
 /**
  * WebViewFragment displays selected url from articles
@@ -49,7 +50,7 @@ class WebViewFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         val article = viewModel.getArticleSelected()
 
@@ -57,7 +58,7 @@ class WebViewFragment : Fragment() {
         val view: View = inflater.inflate(R.layout.web_view_fragment, container, false)
 
         //set the action bar title with the name of the article
-        article?.let { (activity as HomeActvity).setActionBarTitle(it.title) }
+        article?.let { (activity as HomeActivity).setActionBarTitle(it.title) }
 
         val webView = view.findViewById<WebView>(R.id.webView)
         webView.settings.javaScriptEnabled = true
@@ -73,7 +74,7 @@ class WebViewFragment : Fragment() {
             ) {
                 super.onReceivedError(view, request, error)
 
-                Log.wtf(TAG, "onReceivedError: ${error?.description}")
+                Timber.wtf(TAG, "onReceivedError: ${error?.description}")
 
                 if (error != null) {
                     Toast.makeText(
@@ -88,15 +89,15 @@ class WebViewFragment : Fragment() {
         }
 
 
-        webView.loadUrl(article?.url)
+        article?.url?.let { webView.loadUrl(it) }
 
         return view
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        var title = viewModel.articleSelected.value?.title
-        title?.let { (activity as HomeActvity).setActionBarTitle(it) }
+        val title = viewModel.articleSelected.value?.title
+        title?.let { (activity as HomeActivity).setActionBarTitle(it) }
     }
 
     /**

@@ -21,11 +21,8 @@ class NetworkManager(val context: Context) {
 
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-        val activeNetwork = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            connectivityManager.activeNetwork
-        } else {
-            TODO("VERSION.SDK_INT < M")
-        }
+        val activeNetwork = connectivityManager.activeNetwork
+
         val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
 
         return networkCapabilities != null &&

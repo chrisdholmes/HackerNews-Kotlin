@@ -14,13 +14,12 @@ import com.faith.perseverance.hackernews.model.Article
  * of HomeActivity. Provides the article selected to the HomeActivity
  * with the delegate pattern using the CellClickListener interface
  *
- * @param data List<Article>?
  * @param cellClickListener CellClickListener
  */
 
-class ArticleAdapter(private val cellClickListener: CellClickListener) : RecyclerView.Adapter<ArticleAdapter.ViewHolder>() {
+class ArticleAdapter(private val cellClickListener: CellClickListener) :
+    RecyclerView.Adapter<ArticleAdapter.ViewHolder>() {
     var data: MutableList<Article>? = null
-    private var TAG: String = "Adapter"
 
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -38,7 +37,7 @@ class ArticleAdapter(private val cellClickListener: CellClickListener) : Recycle
     }
 
     fun addHits(hits: MutableList<Article>?) {
-        if(hits != null) {
+        if (hits != null) {
             data = hits
         }
         notifyDataSetChanged()
@@ -48,7 +47,7 @@ class ArticleAdapter(private val cellClickListener: CellClickListener) : Recycle
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
         // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
-                .inflate(R.layout.text_row_item, viewGroup, false)
+            .inflate(R.layout.text_row_item, viewGroup, false)
 
         return ViewHolder(view)
 
@@ -59,13 +58,12 @@ class ArticleAdapter(private val cellClickListener: CellClickListener) : Recycle
 
         var title = ""
         var points = ""
-        var url = ""
         var article = Article(url = "https://www.google.com")
 
         if (data != null) {
-            title = data!!.get(position).title
-            points = "Points: ${data!!.get(position).points}"
-            article = data!!.get(position)
+            title = data!![position].title
+            points = "Points: ${data!![position].points}"
+            article = data!![position]
         } else {
             title = "Something went wrong ... "
         }
@@ -88,7 +86,7 @@ class ArticleAdapter(private val cellClickListener: CellClickListener) : Recycle
 
     fun removeAt(position: Int): Article? {
         //retrieve reference to article from data
-        var article = data?.get(position)
+        val article = data?.get(position)
         //remove article from data
         data?.removeAt(position)
         //update recyclerView
@@ -100,7 +98,7 @@ class ArticleAdapter(private val cellClickListener: CellClickListener) : Recycle
 }
 
 /**
- * CellClickListener interface provides delegate pattern between the articl
+ * CellClickListener interface provides delegate pattern between the article
  */
 interface CellClickListener {
     fun onCellClickListener(article: Article)
