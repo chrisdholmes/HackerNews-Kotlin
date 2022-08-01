@@ -44,35 +44,12 @@ abstract class ArticleDatabase : RoomDatabase() {
                         context.applicationContext,
                         ArticleDatabase::class.java,
                         "articles_db"
-                ).addCallback(ArticleDatabaseCallback(scope))
-                        .build()
+                ).build()
                 INSTANCE = instance
                 // return instance
                 instance
             }
         }
     }
-
-    private class ArticleDatabaseCallback(
-            private val scope: CoroutineScope
-    ) : RoomDatabase.Callback() {
-
-        override fun onCreate(db: SupportSQLiteDatabase) {
-            super.onCreate(db)
-            INSTANCE?.let { database ->
-                scope.launch {
-                    populateDatabase(database.articleDAO())
-                }
-            }
-        }
-
-        suspend fun populateDatabase(articleDAO: ArticleDAO) {
-
-            var article = Article("1234", "medium.com/christopher-holmes", "https://www.medium.com/christopher-holmes")
-            articleDAO.addBookmark(article)
-
-        }
-    }
-
 
 }
