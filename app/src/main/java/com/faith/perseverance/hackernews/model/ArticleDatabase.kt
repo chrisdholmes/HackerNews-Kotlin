@@ -2,10 +2,8 @@ package com.faith.perseverance.hackernews.model
 
 import android.content.Context
 import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
 @Dao
 interface ArticleDAO {
@@ -34,16 +32,16 @@ abstract class ArticleDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: ArticleDatabase? = null
 
-        fun getDatabase(context: Context,
-                        scope: CoroutineScope
+        fun getDatabase(
+            context: Context
         ): ArticleDatabase {
             // if the INSTANCE is not null, then return it,
             // if it is, then create the database
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
-                        context.applicationContext,
-                        ArticleDatabase::class.java,
-                        "articles_db"
+                    context.applicationContext,
+                    ArticleDatabase::class.java,
+                    "articles_db"
                 ).build()
                 INSTANCE = instance
                 // return instance

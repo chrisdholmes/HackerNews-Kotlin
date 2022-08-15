@@ -35,7 +35,7 @@ import com.faith.perseverance.hackernews.model.ArticleViewModel
  */
 
 class BookMarksFragment(val application: Application, val supportFragmentManager: FragmentManager) :
-        Fragment(), CellClickListener {
+    Fragment(), CellClickListener {
 
     private val viewModel by activityViewModels<ArticleViewModel>()
     private lateinit var articleAdapter: ArticleAdapter
@@ -43,7 +43,10 @@ class BookMarksFragment(val application: Application, val supportFragmentManager
 
     companion object {
 
-        fun newInstance(application: Application, supportFragmentManager: FragmentManager): BookMarksFragment {
+        fun newInstance(
+            application: Application,
+            supportFragmentManager: FragmentManager
+        ): BookMarksFragment {
             return BookMarksFragment(application, supportFragmentManager)
         }
     }
@@ -54,8 +57,11 @@ class BookMarksFragment(val application: Application, val supportFragmentManager
     }
 
     @SuppressLint("NewApi")
-    @RequiresApi(Build.VERSION_CODES.O)
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         val view: View = inflater.inflate(R.layout.bookmarks_fragment, container, false)
 
         (activity as HomeActivity).setActionBarTitle("Bookmarks")
@@ -69,27 +75,27 @@ class BookMarksFragment(val application: Application, val supportFragmentManager
 
         //call back to observe changes in room database and update the UI
         val observer: Observer<List<Article>> =
-                object : Observer<List<Article>> {
-                    override fun onChanged(bookMarks: List<Article>) {
-                        articleAdapter.data = bookMarks.toMutableList()
-                        recyclerView.adapter = articleAdapter
+            object : Observer<List<Article>> {
+                override fun onChanged(bookMarks: List<Article>) {
+                    articleAdapter.data = bookMarks.toMutableList()
+                    recyclerView.adapter = articleAdapter
 
-                    }
                 }
-
-        val swipeHandler = object : SwipeToDeleteCallback(context = application.applicationContext) {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                super.onSwiped(viewHolder, direction)
-
-                //retrieve reference to the article was removed from the recyclerview after being swiped.
-                var article = articleAdapter.removeAt(viewHolder.adapterPosition)
-
-                //if the article is not null, delete the article from the local Room DB
-                article?.let { viewModel.deleteBookMark(it) }
-
             }
-        }
+
+        val swipeHandler =
+            object : SwipeToDeleteCallback(context = application.applicationContext) {
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    super.onSwiped(viewHolder, direction)
+
+                    //retrieve reference to the article was removed from the recyclerview after being swiped.
+                    val article = articleAdapter.removeAt(viewHolder.adapterPosition)
+
+                    //if the article is not null, delete the article from the local Room DB
+                    article?.let { viewModel.deleteBookMark(it) }
+
+                }
+            }
 
 
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
@@ -104,7 +110,6 @@ class BookMarksFragment(val application: Application, val supportFragmentManager
     /* onCellClickListener passes the article selected from the recyclerview to the view model
     * and then to webfrgament where it can be displayed. */
     @SuppressLint("NewApi")
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCellClickListener(article: Article) {
         // initialize webfragment
         val webfragment = WebViewFragment.newInstance()
@@ -115,9 +120,9 @@ class BookMarksFragment(val application: Application, val supportFragmentManager
         //push fragment to display if only 1 fragment is displayed (1 webviewfrag at at time)
         if (supportFragmentManager.backStackEntryCount < 1) {
             supportFragmentManager
-                    .beginTransaction()
-                    .add(R.id.main_activity_layout, webfragment, "webView")
-                    .commit()
+                .beginTransaction()
+                .add(R.id.main_activity_layout, webfragment, "webView")
+                .commit()
         }
     }
 
@@ -128,6 +133,7 @@ class BookMarksFragment(val application: Application, val supportFragmentManager
 
 
     // onPrepareOptionsMenu is used to hide the bottom available when the BookMarks are displayed
+    @Deprecated("Deprecated in Java")
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         //hide share button

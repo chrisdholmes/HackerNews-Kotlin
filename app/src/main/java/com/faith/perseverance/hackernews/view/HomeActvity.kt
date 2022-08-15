@@ -1,11 +1,10 @@
 package com.faith.perseverance.hackernews.view
 
-import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.SearchView
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -16,6 +15,7 @@ import com.faith.perseverance.hackernews.model.Article
 import com.faith.perseverance.hackernews.model.ArticleViewModel
 import com.faith.perseverance.hackernews.model.ArticleViewModelFactory
 import com.faith.perseverance.hackernews.model.ArticlesApplication
+
 
 /**
  *  HomeActivity is the home page of the HackerNews App.
@@ -31,7 +31,7 @@ import com.faith.perseverance.hackernews.model.ArticlesApplication
  *  @property articleAdapter ArticleAdapter
  *  @property TAG String
  */
-class HomeActivity : AppCompatActivity(), CellClickListener {
+class HomeActivity : AppCompatActivity(), CellClickListener, SearchView.OnQueryTextListener {
 
     private val TAG: String = "HomeActivity"
     private val viewModel: ArticleViewModel by viewModels {
@@ -39,7 +39,7 @@ class HomeActivity : AppCompatActivity(), CellClickListener {
     }
     private lateinit var articleAdapter: ArticleAdapter
 
-    @RequiresApi(Build.VERSION_CODES.O)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -64,7 +64,7 @@ class HomeActivity : AppCompatActivity(), CellClickListener {
      * from the recyclerview's adapter. When a user selects a article
      * in the adapter, this method provides the HomeActivity with access ot the article.
      */
-    @RequiresApi(Build.VERSION_CODES.O)
+
     override fun onCellClickListener(article: Article) {
 
         // initialize webfragment
@@ -75,9 +75,9 @@ class HomeActivity : AppCompatActivity(), CellClickListener {
         //push fragment to display if only 1 fragment is displayed (1 webviewfrag at at time)
         if (supportFragmentManager.backStackEntryCount < 1) {
             supportFragmentManager
-                    .beginTransaction()
-                    .add(R.id.main_activity_layout, webFragment, getString(R.string.webviewtag))
-                    .commit()
+                .beginTransaction()
+                .add(R.id.main_activity_layout, webFragment, getString(R.string.webviewtag))
+                .commit()
         }
     }
 
@@ -89,7 +89,8 @@ class HomeActivity : AppCompatActivity(), CellClickListener {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.display_bookmarks -> {
-            val bookMarksFragment = BookMarksFragment.newInstance(application, supportFragmentManager)
+            val bookMarksFragment =
+                BookMarksFragment.newInstance(application, supportFragmentManager)
             bookMarksFragment.tag
 
             showFragment(bookMarksFragment, "bookmark")
@@ -105,19 +106,28 @@ class HomeActivity : AppCompatActivity(), CellClickListener {
         val share = menu?.findItem(R.id.action_share)
         val bookmark = menu?.findItem(R.id.action_bookmark)
 
+        val searchItem = menu?.findItem(R.id.search)
+
+        val searchView: SearchView = searchItem?.actionView as SearchView
+
+        searchView.queryHint = "Search..."
+
+        searchView.setOnQueryTextListener(this)
+
+
         // set book mark and share buttons to hide when HomeActivity is displayed
         bookmark?.isVisible = false
         share?.isVisible = false
-
-        return super.onCreateOptionsMenu(menu)
+        super.onCreateOptionsMenu(menu)
+        return true
     }
 
     private fun showFragment(fragment: Fragment, tag: String) {
         if (supportFragmentManager.backStackEntryCount < 1) {
             supportFragmentManager
-                    .beginTransaction()
-                    .add(R.id.fragment_placeholder, fragment, tag)
-                    .commit()
+                .beginTransaction()
+                .add(R.id.fragment_placeholder, fragment, tag)
+                .commit()
         }
     }
 
@@ -137,26 +147,22 @@ class HomeActivity : AppCompatActivity(), CellClickListener {
     private fun hideFragment() {
         val count = supportFragmentManager.fragments.size
 
-        if(count == 0 )
-        {
+        if (count == 0) {
             return
         }
         val fragment = supportFragmentManager.fragments[count - 1]
 
-        if(fragment != null) {
+        if (fragment != null) {
             supportFragmentManager.beginTransaction()
-                    .detach(fragment)
-                    .commit()
+                .detach(fragment)
+                .commit()
         }
 
-        if(count == 0) {
+        if (count == 0) {
             return
-        }
-        else if(count == 1)
-        {
+        } else if (count == 1) {
             setActionBarTitle("HackerNews")
-        } else if(count == 2)
-        {
+        } else if (count == 2) {
             setActionBarTitle("Bookmarks")
         }
 
@@ -165,5 +171,19 @@ class HomeActivity : AppCompatActivity(), CellClickListener {
 
     fun setActionBarTitle(title: String) {
         supportActionBar?.title = title
+    }
+
+    override fun onQueryTextSubmit(p0: String?): Boolean {
+
+        viewModel.getSearchQuery(p0.toString())
+
+
+        return true
+    }
+
+    override fun onQueryTextChange(p0: String?): Boolean {
+
+        return true
+
     }
 }

@@ -21,4 +21,10 @@ class ExampleInstrumentedTest {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         assertEquals("com.faith.perseverance.hackernews", appContext.packageName)
     }
+
+    @Test
+    fun openArticle()
+    {
+
+    }
 }

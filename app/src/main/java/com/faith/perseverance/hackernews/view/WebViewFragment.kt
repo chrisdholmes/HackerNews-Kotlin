@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -47,10 +46,11 @@ class WebViewFragment : Fragment() {
     }
 
     //3
-    @RequiresApi(Build.VERSION_CODES.O)
+    
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
 
         val article = viewModel.getArticleSelected()
 
@@ -66,11 +66,10 @@ class WebViewFragment : Fragment() {
 
         webView.webViewClient = object : WebViewClient() {
 
-            @RequiresApi(Build.VERSION_CODES.M)
             override fun onReceivedError(
-                    view: WebView?,
-                    request: WebResourceRequest?,
-                    error: WebResourceError?
+                view: WebView?,
+                request: WebResourceRequest?,
+                error: WebResourceError?
             ) {
                 super.onReceivedError(view, request, error)
 
@@ -78,13 +77,13 @@ class WebViewFragment : Fragment() {
 
                 if (error != null) {
                     Toast.makeText(
-                            activity?.baseContext,
-                            "FAILED: ${error.description}",
-                            Toast.LENGTH_SHORT
+                        activity?.baseContext,
+                        "FAILED: ${error.description}",
+                        Toast.LENGTH_SHORT
                     ).show()
                 }
                 activity?.supportFragmentManager?.beginTransaction()?.remove(this@WebViewFragment)
-                        ?.commit()
+                    ?.commit()
             }
         }
 
@@ -108,7 +107,7 @@ class WebViewFragment : Fragment() {
      *
      * @param menu
      */
-    @RequiresApi(Build.VERSION_CODES.O)
+    
     override fun onPrepareOptionsMenu(menu: Menu) {
         //Display share button
         menu.findItem(R.id.action_share).isVisible = true
@@ -141,7 +140,7 @@ class WebViewFragment : Fragment() {
         val save = menu.findItem(R.id.action_bookmark)
 
         save.setOnMenuItemClickListener(object : MenuItem.OnMenuItemClickListener {
-            @RequiresApi(Build.VERSION_CODES.O)
+            
             override fun onMenuItemClick(item: MenuItem?): Boolean {
                 viewModel.bookMarkSelectedArticle()
 

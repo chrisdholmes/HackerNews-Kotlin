@@ -19,7 +19,8 @@ class NetworkManager(val context: Context) {
 
     private fun isNetworkConnected(): Boolean {
 
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         val activeNetwork = connectivityManager.activeNetwork
 

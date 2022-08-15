@@ -7,7 +7,7 @@ import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 class ArticleViewModel(private val repository: ArticleRepository) : ViewModel() {
 
     val articles: MutableLiveData<List<Article>> by lazy {
@@ -40,9 +40,20 @@ class ArticleViewModel(private val repository: ArticleRepository) : ViewModel() 
         }
     }
 
+    fun getSearchQuery(searchQuery: String) {
+        viewModelScope.launch {
 
-    fun getArticles()
-    {
+            try {
+                repository.getSearchQuery(searchQuery)
+                articles.postValue(repository.articles.value)
+            } catch (e: Exception) {
+                Log.v(TAG, e.toString())
+            }
+        }
+    }
+
+    //getArticles() retrieves all articles from the front_page of hn.algolia.com
+    fun getArticles() {
         viewModelScope.launch {
 
             try {
@@ -70,8 +81,9 @@ class ArticleViewModel(private val repository: ArticleRepository) : ViewModel() 
 
 }
 
-class ArticleViewModelFactory(private val repository: ArticleRepository) : ViewModelProvider.Factory {
-    @RequiresApi(Build.VERSION_CODES.O)
+class ArticleViewModelFactory(private val repository: ArticleRepository) :
+    ViewModelProvider.Factory {
+    
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ArticleViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

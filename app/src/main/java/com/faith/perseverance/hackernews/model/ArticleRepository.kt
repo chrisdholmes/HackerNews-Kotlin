@@ -35,7 +35,7 @@ class ArticleRepository(private val articleDAO: ArticleDAO) {
         articleDAO.deleteAll()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    
     suspend fun getArticles() {
         var hits = listOf<Article>()
         coroutineScope {
@@ -52,6 +52,24 @@ class ArticleRepository(private val articleDAO: ArticleDAO) {
         articles.value = hits
         Log.v(TAG, "coroutine completed - ${now()} ${articles.value}")
 
+    }
+
+    
+    suspend fun getSearchQuery(searchQuery: String) {
+        var hits = listOf<Article>()
+        coroutineScope {
+            launch {
+                try {
+                    Log.v(TAG, "coroutine launched - ${now()}")
+                    hits = HNApi.retrofitService.getSearchQuery(searchQuery).hits
+                } catch (e: Exception) {
+                    Log.v(TAG, e.toString())
+                    Log.v(TAG, "coroutine failed - ${now()}")
+                }
+            }
+        }
+        articles.value = hits
+        Log.v(TAG, "coroutine completed - ${now()} ${articles.value}")
     }
 
 }

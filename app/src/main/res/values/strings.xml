@@ -5,4 +5,5 @@
     <string name="save">Save</string>
     <string name="bookmarks">Bookmarks</string>
     <string name="webviewtag">webview</string>
+    <string name="search_title">Search...</string>
 </resources>
