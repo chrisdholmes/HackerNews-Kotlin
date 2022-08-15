@@ -8,7 +8,7 @@ class ArticlesApplication : Application() {
 
     val applicationScope = CoroutineScope(SupervisorJob())
 
-    val database by lazy { ArticleDatabase.getDatabase(this, applicationScope) }
+    val database by lazy { ArticleDatabase.getDatabase(this) }
 
     val repository by lazy { ArticleRepository(database.articleDAO()) }
 }
